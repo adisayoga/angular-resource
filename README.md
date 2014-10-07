@@ -5,9 +5,9 @@ This work just like angular resource, expect it return promise.
 I love the simplicity of angular resource, but it lack of some thing. so I create
 this service to fulfill my needs:
 
-    * It uses promise
-    * Support for wrapped responses
-    * Additional put method for updating data
+* It uses promise
+* Support for wrapped responses
+* Additional put method for updating data
 
 ## Installation
 

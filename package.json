@@ -1,6 +1,6 @@
 {
   "name": "angular-resource",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "karma-ie-launcher": "^0.1.5",
     "karma-jasmine": "^0.1.5"

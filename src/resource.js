@@ -12,11 +12,11 @@ angular.module('sg-resource', []);
 
 angular.module('sg-resource').factory('resource', function($http, $parse) {
   var DEFAULT_ACTIONS = {
-    'query':  { method: 'GET', isArray: true, isResource: true },
-    'get':    { method: 'GET', isResource: true },
-    'post':   { method: 'POST', isResource: true, hasBody: true },
-    'put':    { method: 'PUT', isResource: true, hasBody: true },
-    'remove': { method: 'DELETE' }
+    query:  { method: 'GET', isArray: true, isResource: true, wrap: 'data' },
+    get:    { method: 'GET', isResource: true },
+    post:   { method: 'POST', isResource: true, hasBody: true },
+    put:    { method: 'PUT', isResource: true, hasBody: true },
+    remove: { method: 'DELETE' }
   };
 
   function encodeUriSegment(val) {
@@ -85,10 +85,26 @@ angular.module('sg-resource').factory('resource', function($http, $parse) {
     return ids;
   }
 
+  function deepExtend(dst) {
+    for (var i = 0, length = arguments.length; i < length; i++) {
+      var obj = arguments[i];
+      if (obj === dst) continue;
+
+      for (var key in obj) {
+        var value = obj[key];
+        if (dst[key] && dst[key].constructor && dst[key].constructor === Object) {
+          deepExtend(dst[key], value);
+        } else {
+          dst[key] = value;
+        }
+      }
+    }
+    return dst;
+  }
+
   var resourceFactory = function(url, paramDefaults, actions) {
     if (actions) actions = JSON.parse(JSON.stringify(actions));
-    actions = angular.extend({}, DEFAULT_ACTIONS, actions);
-
+    actions = deepExtend(DEFAULT_ACTIONS, actions);
     var NewResource = function(data) {
       angular.copy(data, this);
     };
@@ -139,8 +155,7 @@ angular.module('sg-resource').factory('resource', function($http, $parse) {
           var data = response.data;
           if (!action.isResource) return data;
           if (!action.isArray) return new Resource(data);
-
-          var items = angular.isArray(data) ? data : data.data;
+          var items = angular.isArray(data) ? data : data[action.wrap];
           angular.forEach(items, function(item, i) {
             items[i] = new Resource(item);
           });

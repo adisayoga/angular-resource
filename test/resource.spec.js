@@ -95,6 +95,35 @@ describe('Angular resource test', function() {
     $httpBackend.flush();
   });
 
+  it('should read custom wrapped list of resources', function() {
+    var EmployeeWrap = resource('/employees', null, { query:  { wrap: 'items' }});
+
+    $httpBackend.expectGET('/employees').respond({
+      items: [
+        { employee_id: 123, name: 'Nengah' },
+        { employee_id: 124, name: 'Adi' },
+        { employee_id: 125, name: 'Sayoga' }
+      ],
+      pageNo: 1,
+      pageCount: 7
+    });
+    EmployeeWrap.query().then(function(responses) {
+      expect(responses).toEqualData({
+        items: [
+          { employee_id: 123, name: 'Nengah' },
+          { employee_id: 124, name: 'Adi' },
+          { employee_id: 125, name: 'Sayoga' }
+        ],
+        pageNo: 1,
+        pageCount: 7
+      });
+      expect(responses.items[0] instanceof EmployeeWrap).toBe(true);
+      expect(responses.items[1] instanceof EmployeeWrap).toBe(true);
+      expect(responses.items[2] instanceof EmployeeWrap).toBe(true);
+    });
+    $httpBackend.flush();
+  });
+
   it('should update resource', function() {
     $httpBackend.expectPUT('/employees/123', '{"employee_id":123,"name":"Adi"}').
                  respond({ employee_id: 123, name: 'Adi' });
